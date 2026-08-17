@@ -31,6 +31,8 @@ export interface PlanDefinition {
 
     cta?: string;
     hidden?: boolean;
+    /** Plan on the pre-v2 usage model, so its usage is measured with different metrics. */
+    legacy?: boolean;
     flags: Omit<Partial<DBPlan>, 'id' | 'account_id' | 'name'>;
 }
 

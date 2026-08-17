@@ -46,6 +46,7 @@ export const starterV1Plan: PlanDefinition = {
     nextPlan: null,
     canChange: true,
     hidden: true,
+    legacy: true,
     basePrice: 50,
     flags: {
         api_rate_limit_size: 'l',
@@ -85,6 +86,7 @@ export const growthV1Plan: PlanDefinition = {
     nextPlan: null,
     canChange: true,
     hidden: true,
+    legacy: true,
     basePrice: 500,
     flags: {
         api_rate_limit_size: 'xl',
@@ -232,6 +234,7 @@ export const starterLegacyPlan: PlanDefinition = {
     nextPlan: [],
     canChange: false,
     hidden: true,
+    legacy: true,
     flags: {
         api_rate_limit_size: 'l',
         environments_max: 3,
@@ -271,6 +274,7 @@ export const scaleLegacyPlan: PlanDefinition = {
     nextPlan: [],
     canChange: false,
     hidden: true,
+    legacy: true,
     flags: {
         api_rate_limit_size: 'l',
         environments_max: 3,
@@ -310,6 +314,7 @@ export const growthLegacyPlan: PlanDefinition = {
     nextPlan: [],
     canChange: false,
     hidden: true,
+    legacy: true,
     flags: {
         api_rate_limit_size: 'l',
         environments_max: 3,
