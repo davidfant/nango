@@ -12,6 +12,7 @@ import { listIntegrationsTool } from './integrations/list.js';
 import { updateIntegrationsTool } from './integrations/update.js';
 import { getLogOperationTool } from './logs/getOperation.js';
 import { listLogOperationsTool } from './logs/listOperations.js';
+import { proxyRequestTool } from './proxy/request.js';
 import { handleMcpToolError, jsonStructuredContent } from './utils.js';
 
 import type { ManagementMcpContext, ManagementMcpRequiredScopes, ManagementMcpTool } from './managementTool.js';
@@ -26,6 +27,7 @@ const managementMcpTools: ManagementMcpTool[] = [
     updateIntegrationsTool,
     deleteIntegrationsTool,
     listConnectionsTool,
+    proxyRequestTool,
     listLogOperationsTool,
     getLogOperationTool
 ];
