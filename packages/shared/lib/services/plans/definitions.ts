@@ -7,6 +7,7 @@ export const freePlan: PlanDefinition = {
     prevPlan: null,
     nextPlan: ['starter-v2', 'growth-v2', 'enterprise'],
     canChange: true,
+    legacy: false,
     basePrice: 0,
     flags: {
         api_rate_limit_size: 'm',
@@ -126,6 +127,7 @@ export const starterV2Plan: PlanDefinition = {
     prevPlan: ['free'],
     nextPlan: ['growth-v2', 'enterprise'],
     canChange: true,
+    legacy: false,
     basePrice: 50,
     flags: {
         ...starterV1Plan.flags,
@@ -143,6 +145,7 @@ export const growthV2Plan: PlanDefinition = {
     prevPlan: ['free', 'starter-v2'],
     nextPlan: ['enterprise'],
     canChange: true,
+    legacy: false,
     basePrice: 500,
     flags: growthV1Plan.flags
 };
@@ -154,6 +157,7 @@ export const enterprisePlan: PlanDefinition = {
     prevPlan: ['free', 'starter', 'growth'],
     nextPlan: null,
     canChange: false,
+    legacy: false,
     cta: 'Contact Us',
     flags: {
         api_rate_limit_size: '2xl',
@@ -194,6 +198,7 @@ export const enterpriseCloudHostedPlan: PlanDefinition = {
     nextPlan: [],
     canChange: false,
     hidden: true,
+    legacy: false,
     basePrice: 5_000,
     flags: {
         ...growthV2Plan.flags,
@@ -209,6 +214,7 @@ export const freeUncappedPlan: PlanDefinition = {
     nextPlan: [],
     canChange: false,
     hidden: true,
+    legacy: false,
     basePrice: 0,
     flags: growthV2Plan.flags
 };
@@ -221,6 +227,7 @@ export const startupDealPlan: PlanDefinition = {
     nextPlan: [],
     canChange: false,
     hidden: true,
+    legacy: false,
     basePrice: 0,
     flags: growthV2Plan.flags
 };

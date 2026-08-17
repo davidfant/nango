@@ -31,8 +31,11 @@ export interface PlanDefinition {
 
     cta?: string;
     hidden?: boolean;
-    /** Plan on the pre-v2 usage model, so its usage is measured with different metrics. */
-    legacy?: boolean;
+    /**
+     * Plan on the pre-v2 usage model, so its usage is measured with different metrics.
+     * Required rather than optional so adding a plan forces this call rather than defaulting it.
+     */
+    legacy: boolean;
     flags: Omit<Partial<DBPlan>, 'id' | 'account_id' | 'name'>;
 }
 
