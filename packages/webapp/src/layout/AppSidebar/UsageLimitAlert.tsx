@@ -18,15 +18,15 @@ const VARIANTS = {
         Icon: CircleAlert,
         title: 'Plan limits reached',
         body: `You've hit Free plan limits. Upgrade to keep things running.`,
-        container: 'bg-status-danger-bg border-status-danger-border',
-        accent: 'text-status-danger-text'
+        container: 'bg-status-warning-bg border-status-warning-border',
+        accent: 'text-status-warning-text'
     }
 } as const;
 
 /**
  * Sidebar alert for Free accounts approaching or exceeding their plan caps. Rolls the per-metric
- * usage up to a single state (`getAggregateUsageState`) and shows a warning or danger banner linking
- * to the usage page; renders nothing while loading or when usage is comfortably under every cap.
+ * usage up to a single state (`getAggregateUsageState`) and shows a warning banner linking to the
+ * usage page; renders nothing while loading or when usage is comfortably under every cap.
  */
 export default function UsageLimitAlert() {
     const env = useStore((state) => state.env);
