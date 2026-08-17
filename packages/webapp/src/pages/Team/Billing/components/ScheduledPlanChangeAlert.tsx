@@ -1,4 +1,3 @@
-import { format } from 'date-fns';
 import { Clock9 } from 'lucide-react';
 import { useMemo } from 'react';
 
@@ -27,7 +26,16 @@ export const ScheduledPlanChangeAlert: React.FC = () => {
             return null;
         }
 
-        return { targetPlan, at: format(new Date(currentPlan.orb_future_plan_at), 'MMM d, yyyy') };
+        // Orb schedules changes at midnight UTC, so formatting in local time would show the previous
+        // day for every negative-offset viewer.
+        const at = new Date(currentPlan.orb_future_plan_at).toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric',
+            timeZone: 'UTC'
+        });
+
+        return { targetPlan, at };
     }, [currentPlan, plansList]);
 
     if (!scheduledChange) {
