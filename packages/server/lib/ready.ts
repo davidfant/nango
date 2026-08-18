@@ -2,39 +2,35 @@ import db from '@nangohq/database';
 
 import { asyncWrapper } from './utils/asyncWrapper.js';
 
-const state = {
-    isReady: false,
-    isShuttingDown: false
+type DatabaseQuery = () => Promise<{ rowCount?: number }>;
+
+export const createDatabaseReadiness = (query: DatabaseQuery) => {
+    let isShuttingDown = false;
+
+    return {
+        beginShutdown: () => {
+            isShuttingDown = true;
+        },
+        check: async () => {
+            if (isShuttingDown) {
+                return false;
+            }
+
+            try {
+                return (await query()).rowCount === 1;
+            } catch {
+                return false;
+            }
+        }
+    };
 };
 
-async function isReady(): Promise<boolean> {
-    // Once shutdown has begun, always report unready.
-    if (state.isShuttingDown) {
-        return false;
-    }
+const readiness = createDatabaseReadiness(() => db.knex.raw('SELECT 1'));
 
-    // Check database connectivity once at startup.
-    // After the first successful check, assume continued readiness
-    // and ignore transient DB or network issues.
-    if (!state.isReady) {
-        try {
-            const res = await db.knex.raw('SELECT 1');
-            state.isReady = res.rowCount === 1;
-        } catch {
-            return false;
-        }
-    }
-
-    return state.isReady;
-}
-
-export function beginShutdown(): void {
-    state.isShuttingDown = true;
-    state.isReady = false;
-}
+export const beginShutdown = readiness.beginShutdown;
 
 export const getReady = asyncWrapper<any, any>(async (_, res) => {
-    if (await isReady()) {
+    if (await readiness.check()) {
         res.status(200).send({ result: 'ok' });
         return;
     }
