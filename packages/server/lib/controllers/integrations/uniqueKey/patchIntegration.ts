@@ -14,7 +14,7 @@ import { asyncWrapper } from '../../../utils/asyncWrapper.js';
 import { resolveIntegrationConfig } from '../../v1/integrations/integrationConfig.js';
 import { validationParams } from './getIntegration.js';
 
-import type { PatchPublicIntegration } from '@nangohq/types';
+import type { PatchPublicIntegration, ProviderMcpOAUTH2 } from '@nangohq/types';
 
 const validationBody = z
     .object({
@@ -61,7 +61,8 @@ export const patchPublicIntegration = asyncWrapper<PatchPublicIntegration>(async
         return;
     }
 
-    if (body.credentials && body.credentials.type !== provider.auth_mode) {
+    const usesStaticMcpOAuth = provider.auth_mode === 'MCP_OAUTH2' && (provider as ProviderMcpOAUTH2).client_registration === 'static';
+    if (body.credentials && (body.credentials.type !== provider.auth_mode || (body.credentials.type === 'MCP_OAUTH2' && !usesStaticMcpOAuth))) {
         res.status(400).send({ error: { code: 'invalid_body', message: 'incompatible credentials auth type and provider auth' } });
         return;
     }
@@ -125,7 +126,8 @@ export const patchPublicIntegration = asyncWrapper<PatchPublicIntegration>(async
     if (creds) {
         switch (creds.type) {
             case 'OAUTH1':
-            case 'OAUTH2': {
+            case 'OAUTH2':
+            case 'MCP_OAUTH2': {
                 integration.oauth_client_id = creds.client_id;
                 integration.oauth_client_secret = creds.client_secret;
                 integration.oauth_scopes = creds.scopes;

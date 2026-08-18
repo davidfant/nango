@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
-import { seeders } from '@nangohq/shared';
+import { configService, seeders } from '@nangohq/shared';
 
 import { isError, isSuccess, runServer, shouldBeProtected } from '../../../utils/tests.js';
 
@@ -71,6 +71,56 @@ describe(`PATCH ${endpoint}`, () => {
                 updated_at: expect.toBeIsoDate(),
                 forward_webhooks: true
             }
+        });
+    });
+
+    it('should update a static MCP OAuth integration with API-key credentials', async () => {
+        const { env, apiKey } = await seeders.seedAccountEnvAndUser();
+        await seeders.createConfigSeed(env, 'hubspot-mcp', 'hubspot-mcp');
+        const res = await api.fetch(endpoint, {
+            method: 'PATCH',
+            token: apiKey.secret,
+            params: { uniqueKey: 'hubspot-mcp' },
+            body: {
+                credentials: {
+                    type: 'MCP_OAUTH2',
+                    client_id: 'updated-client-id',
+                    client_secret: 'updated-client-secret',
+                    scopes: ''
+                }
+            }
+        });
+
+        isSuccess(res.json);
+
+        const integration = await configService.getProviderConfig('hubspot-mcp', env.id);
+        expect(integration).toMatchObject({
+            oauth_client_id: 'updated-client-id',
+            oauth_client_secret: 'updated-client-secret',
+            oauth_scopes: ''
+        });
+    });
+
+    it('should reject MCP OAuth credential updates for a dynamically registered provider', async () => {
+        const { env, apiKey } = await seeders.seedAccountEnvAndUser();
+        await seeders.createConfigSeed(env, 'amplitude-mcp', 'amplitude-mcp');
+        const res = await api.fetch(endpoint, {
+            method: 'PATCH',
+            token: apiKey.secret,
+            params: { uniqueKey: 'amplitude-mcp' },
+            body: {
+                credentials: {
+                    type: 'MCP_OAUTH2',
+                    client_id: 'client-id',
+                    client_secret: 'client-secret',
+                    scopes: ''
+                }
+            }
+        });
+
+        isError(res.json);
+        expect(res.json).toStrictEqual<typeof res.json>({
+            error: { code: 'invalid_body', message: 'incompatible credentials auth type and provider auth' }
         });
     });
 

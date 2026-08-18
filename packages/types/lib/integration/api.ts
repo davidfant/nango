@@ -346,6 +346,12 @@ export type ApiPublicIntegrationCredentials =
           webhook_secret?: string | undefined;
       }
     | {
+          type: Extract<AuthModeType, 'MCP_OAUTH2'>;
+          client_id: string;
+          client_secret: string;
+          scopes?: string | undefined;
+      }
+    | {
           type: Extract<AuthModeType, 'APP'>;
           app_id: string;
           app_link: string;

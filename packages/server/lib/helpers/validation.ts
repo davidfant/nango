@@ -122,6 +122,14 @@ export const integrationCredentialsSchema = z.discriminatedUnion(
             .strict(),
         z
             .object({
+                type: z.literal('MCP_OAUTH2'),
+                client_id: z.string().min(1).max(255),
+                client_secret: z.string().min(1),
+                scopes: z.union([z.string().regex(/^[0-9a-zA-Z:/_.-]+(,[0-9a-zA-Z:/_.-]+)*$/), z.string().max(0)]).optional()
+            })
+            .strict(),
+        z
+            .object({
                 type: z.enum(['APP']),
                 app_id: z.string().min(1).max(255),
                 app_link: z.string().min(1),

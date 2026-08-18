@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
-import { seeders } from '@nangohq/shared';
+import { configService, seeders } from '@nangohq/shared';
 
 import { isError, isSuccess, runServer, shouldBeProtected } from '../../utils/tests.js';
 
@@ -82,6 +82,90 @@ describe(`POST ${endpoint}`, () => {
                 updated_at: expect.toBeIsoDate(),
                 forward_webhooks: true
             }
+        });
+    });
+
+    it('should create a static MCP OAuth integration with API-key credentials', async () => {
+        const { env, apiKey } = await seeders.seedAccountEnvAndUser();
+        const res = await api.fetch(endpoint, {
+            method: 'POST',
+            token: apiKey.secret,
+            body: {
+                provider: 'hubspot-mcp',
+                unique_key: 'hubspot-mcp',
+                credentials: {
+                    type: 'MCP_OAUTH2',
+                    client_id: 'client-id',
+                    client_secret: 'client-secret',
+                    scopes: ''
+                }
+            }
+        });
+
+        isSuccess(res.json);
+
+        const integration = await configService.getProviderConfig('hubspot-mcp', env.id);
+        expect(integration).toMatchObject({
+            oauth_client_id: 'client-id',
+            oauth_client_secret: 'client-secret',
+            oauth_scopes: ''
+        });
+    });
+
+    it('should require credentials for a static MCP OAuth integration', async () => {
+        const { apiKey } = await seeders.seedAccountEnvAndUser();
+        const res = await api.fetch(endpoint, {
+            method: 'POST',
+            token: apiKey.secret,
+            body: {
+                provider: 'hubspot-mcp',
+                unique_key: 'hubspot-mcp'
+            }
+        });
+
+        isError(res.json);
+        expect(res.json).toStrictEqual<typeof res.json>({
+            error: { code: 'invalid_body', message: 'Missing credentials' }
+        });
+    });
+
+    it('should reject MCP OAuth credentials for a dynamically registered provider', async () => {
+        const { apiKey } = await seeders.seedAccountEnvAndUser();
+        const res = await api.fetch(endpoint, {
+            method: 'POST',
+            token: apiKey.secret,
+            body: {
+                provider: 'amplitude-mcp',
+                unique_key: 'amplitude-mcp',
+                credentials: {
+                    type: 'MCP_OAUTH2',
+                    client_id: 'client-id',
+                    client_secret: 'client-secret',
+                    scopes: ''
+                }
+            }
+        });
+
+        isError(res.json);
+        expect(res.json).toStrictEqual<typeof res.json>({
+            error: { code: 'invalid_body', message: 'Public API only supports static MCP OAuth providers' }
+        });
+    });
+
+    it('should reject dynamically registered MCP OAuth providers without credentials', async () => {
+        const { apiKey } = await seeders.seedAccountEnvAndUser();
+        const res = await api.fetch(endpoint, {
+            method: 'POST',
+            token: apiKey.secret,
+            body: {
+                provider: 'amplitude-mcp',
+                unique_key: 'amplitude-mcp'
+            }
+        });
+
+        isError(res.json);
+        expect(res.json).toStrictEqual<typeof res.json>({
+            error: { code: 'invalid_body', message: 'Public API only supports static MCP OAuth providers' }
         });
     });
 
